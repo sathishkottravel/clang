@@ -24,3 +24,6 @@ target_link_libraries(skepu-tool
   clangBasic
   clangASTMatchers
   )
+  
+install(TARGETS skepu-tool
+  RUNTIME DESTINATION bin)

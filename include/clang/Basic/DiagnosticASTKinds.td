@@ -274,4 +274,19 @@ def err_odr_non_type_parameter_type_inconsistent : Error<
   "non-type template parameter declared with incompatible types in different "
   "translation units (%0 vs. %1)">;
 def err_unsupported_ast_node: Error<"cannot import unsupported AST node %0">;
+  
+// SkePU diagnostics
+def err_skepu_no_userfunction_body : Error<
+  "[SkePU] Declaration of function %0 with skepu::userfunction attribute is not a definition">;
+def err_skepu_arg_not_a_userfunction : Error<
+  "[SkePU] Argument is not a userfunction">;
+def err_skepu_invalid_out_attribute : Error<
+  "[SkePU] Invalid skepu::out attribute on pointer-to-const userfunction parameter %0">;
+def err_skepu_userfunction_call : Error<
+  "[SkePU] Function call inside user function with callee '%0' which is not a user function or an exempted function name">;
+  
+def warn_skepu_no_userfunction_attr : Warning<
+  "[SkePU] Function %0 does not have the skepu::userfunction attribute">;
+def warn_skepu_explicit_function_address_of : Warning<
+  "[SkePU] Explicit addressof-operator on userfunction argument">;
 }

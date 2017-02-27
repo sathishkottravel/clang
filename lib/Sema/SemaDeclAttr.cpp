@@ -2069,6 +2069,53 @@ static void handleObjCSuppresProtocolAttr(Sema &S, Decl *D,
                                        Attr.getAttributeSpellingListIndex()));
 }
 
+// ---------------  
+//  SkePU attributes
+// ---------------
+
+/*
+// [[skepu::userfunction]]
+static void handleSkepuUserFunctionAttr(Sema &S, Decl *D, const AttributeList &Attr)
+{
+	uint32_t numArgs;
+	if (Attr.getNumArgs() && !checkUInt32Argument(S, Attr, Attr.getArgAsExpr(0), numArgs))
+		return;
+	
+	D->addAttr(::new (S.Context)
+		SkepuUserFunctionAttr(Attr.getRange(), S.Context, numArgs,
+			Attr.getAttributeSpellingListIndex()));
+}*/
+
+// [[skepu::accessmode(...)]]
+static void handleSkepuAccessModeAttr(Sema &S, Decl *D, const AttributeList &Attr)
+{
+	// Check the attribute arguments.
+	if (Attr.getNumArgs() > 1)
+	{
+		S.Diag(Attr.getLoc(), diag::err_attribute_too_many_arguments) << Attr.getName() << 1;
+		return;
+	}
+	
+	StringRef Str;
+	SourceLocation ArgLoc;
+	
+	if (Attr.getNumArgs() == 0)
+		Str = "";
+	else if (!S.checkStringLiteralArgumentAttr(Attr, 0, Str, &ArgLoc))
+		return;
+	
+	SkepuAccessModeAttr::AccessMode Mode;
+	if (!SkepuAccessModeAttr::ConvertStrToAccessMode(Str, Mode))
+	{
+		S.Diag(Attr.getLoc(), diag::warn_attribute_type_not_supported) << Attr.getName() << Str << ArgLoc;
+		return;
+	}
+	
+	unsigned Index = Attr.getAttributeSpellingListIndex();
+	D->addAttr(::new (S.Context)
+		SkepuAccessModeAttr(Attr.getLoc(), S.Context, Mode, Index));
+}
+
 static bool checkAvailabilityAttr(Sema &S, SourceRange Range,
                                   IdentifierInfo *Platform,
                                   VersionTuple Introduced,
@@ -6223,6 +6270,42 @@ static void ProcessDeclAttribute(Sema &S, Scope *scope, Decl *D,
   case AttributeList::AT_XRayInstrument:
     handleSimpleAttribute<XRayInstrumentAttr>(S, D, Attr);
     break;
+  
+  
+  // ---------------  
+  //  SkePU attributes
+  // ---------------
+  
+  // [[skepu::userfunction]]
+  case AttributeList::AT_SkepuUserFunction:
+    handleSimpleAttribute<SkepuUserFunctionAttr>(S, D, Attr);
+    break;
+
+  // [[skepu::usertype]]
+  case AttributeList::AT_SkepuUserType:
+    handleSimpleAttribute<SkepuUserTypeAttr>(S, D, Attr);
+    break;
+ 
+  // [[skepu::userconstant]]
+  case AttributeList::AT_SkepuUserConstant:
+    handleSimpleAttribute<SkepuUserConstantAttr>(S, D, Attr);
+    break;
+    
+  // [[skepu::out]]
+  case AttributeList::AT_SkepuOut:
+    handleSimpleAttribute<SkepuOutAttr>(S, D, Attr);
+    break;
+  
+  // [[skepu::accessmode(...)]]
+  case AttributeList::AT_SkepuAccessMode:
+    handleSkepuAccessModeAttr(S, D, Attr);
+    break;  
+    
+  // [[skepu::instance]]
+  case AttributeList::AT_SkepuInstance:
+    handleSimpleAttribute<SkepuInstanceAttr>(S, D, Attr);
+    break;
+    
   }
 }
 

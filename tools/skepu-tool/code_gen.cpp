@@ -6,7 +6,7 @@ using namespace clang;
 void printParamList(std::ostream &o, const FunctionDecl *f)
 {
 	bool first = true;
-	for (const ParmVarDecl* Parm : f->params())
+	for (const ParmVarDecl* Parm : f->parameters())
 	{
 		// default arg?
 		if (!first) o << ", ";
